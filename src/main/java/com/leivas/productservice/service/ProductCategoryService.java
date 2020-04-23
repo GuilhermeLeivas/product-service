@@ -46,6 +46,6 @@ public class ProductCategoryService {
 
         publisher.publishEvent(new ResourceCreatedEvent(this, response, savedProductCategory.getId()));
 
-        return ResponseEntity.ok(savedProductCategory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductCategory);
     }
 }

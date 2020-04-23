@@ -56,4 +56,10 @@ public class ProductResource {
         produtoService.uploadPhoto(id, file);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProdut(@RequestBody @Valid Product product, @PathVariable String id) {
+
+        return produtoService.updateProduct(product, id);
+    }
+
 }
