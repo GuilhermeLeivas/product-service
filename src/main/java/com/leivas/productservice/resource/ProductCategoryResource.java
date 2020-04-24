@@ -3,6 +3,7 @@ package com.leivas.productservice.resource;
 import com.leivas.productservice.model.ProductCategory;
 import com.leivas.productservice.service.ProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class ProductCategoryResource {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable String id) {
 
         productCategoryService.deleteCategoryById(id);
