@@ -16,8 +16,8 @@ public class AmazonConfig {
     public AmazonS3 s3() {
 
         AWSCredentials awsCredentials = new BasicAWSCredentials(
-                "AKIAIOFZ4ISMBAWNLH3A",
-                "8JIcnAN89/fvlIEgNZxYyGFGjsubDXx0a9x5DIdv");
+                "",
+                "");
 
         AmazonS3 build = AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).withRegion(Regions.AP_SOUTH_1)
