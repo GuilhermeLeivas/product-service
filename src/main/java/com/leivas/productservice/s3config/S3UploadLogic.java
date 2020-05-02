@@ -55,8 +55,8 @@ public class S3UploadLogic {
         return metadata;
     }
 
-    private Product checkIfProductExists(String userProfileId) {
-        return productRepository.findById(userProfileId)
+    private Product checkIfProductExists(String productId) {
+        return productRepository.findById(productId)
                                 .orElseThrow(() -> new EmptyResultDataAccessException(1));
     }
 
