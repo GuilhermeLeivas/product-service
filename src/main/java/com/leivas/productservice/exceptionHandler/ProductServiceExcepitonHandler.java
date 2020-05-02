@@ -1,5 +1,7 @@
 package com.leivas.productservice.exceptionHandler;
 
+import com.leivas.productservice.exceptionHandler.errordetail.ErrorDetail;
+import com.leivas.productservice.exceptionHandler.exceptions.ErrorDuringProductUpdate;
 import com.netflix.discovery.shared.transport.TransportException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +13,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.LocalDate;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ControllerAdvice
 public class ProductServiceExcepitonHandler extends ResponseEntityExceptionHandler {
@@ -36,6 +42,19 @@ public class ProductServiceExcepitonHandler extends ResponseEntityExceptionHandl
     public ResponseEntity<?> handleTransportException(TransportException ex,WebRequest request) {
 
         return handleExceptionInternal(ex, null, new HttpHeaders(), HttpStatus.BAD_GATEWAY, request);
+    }
+
+    @ExceptionHandler({ErrorDuringProductUpdate.class})
+    public ResponseEntity<?> handleErrorDuringProductUpdate(ErrorDuringProductUpdate ex, WebRequest request) {
+
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .timestamp(LocalDate.now())
+                .error("ErrorDuringProductUpdate")
+                .message("Update error, try again")
+                .status(BAD_REQUEST)
+                .build();
+
+        return ResponseEntity.status(BAD_REQUEST).body(errorDetail);
     }
 
 

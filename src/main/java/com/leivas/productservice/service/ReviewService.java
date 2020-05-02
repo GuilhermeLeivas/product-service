@@ -27,36 +27,33 @@ public class ReviewService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
-    public ResponseEntity<Review> findReviewById(String id) {
+    public Review findReviewById(String id) {
 
-        Optional<Review> reviewByIdFound = reviewRepository.findById(id);
-
-        return ifReviewIsPresentOrNot(reviewByIdFound);
+        return reviewRepository.findById(id)
+                                    .orElseThrow(() -> new EmptyResultDataAccessException(1));
 
     }
+    public Review createNewReview(Review review, String productId, String userId, HttpServletResponse response) {
 
-    private ResponseEntity<Review> ifReviewIsPresentOrNot(Optional<Review> reviewByIdFound) {
-
-        if(reviewByIdFound.isPresent()) {
-
-            return ResponseEntity.ok(reviewByIdFound.get());
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    public ResponseEntity<Review> createNewReview(Review review, String productId, String userId, HttpServletResponse response) {
-
-        Optional<Product> product = checkIfProductExists(productId);
+        Product product = checkIfProductExists(productId);
         review.setUserId(userId);
 
         reviewRepository.save(review);
-        product.ifPresent(productFoundById -> productFoundById.addReview(review));
+        product.getReviews().add(review);
+        productRepository.save(product);
         publisher.publishEvent(new ResourceCreatedEvent(this, response, review.getId()));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(review);
+        return review;
     }
 
-    private Optional<Product> checkIfProductExists(String productId) {
-        return productRepository.findById(productId);
+    public ResponseEntity<Review> updateReview(Review review, String reviewId, String userId) {
+
+        // TODO : Implement this method/ i must verify if review userId its the same as the userId received inside the request
+
+        return null;
+    }
+
+    private Product checkIfProductExists(String productId) {
+        return productRepository.findById(productId).orElseThrow(() -> new EmptyResultDataAccessException(1));
     }
 }

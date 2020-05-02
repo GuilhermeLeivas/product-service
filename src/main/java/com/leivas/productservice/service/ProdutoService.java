@@ -10,12 +10,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -35,29 +38,28 @@ public class ProdutoService {
     private ApplicationEventPublisher publisher;
 
 
-    public List<Product> findAllProductsOrSearchService(@Nullable String productName) {
+    public Page<Product> findAllProductsOrSearchService(@Nullable String productName, Pageable pageable) {
 
         if(!productName.isEmpty()) {
-            return productRepository.findByProductName(productName);
+            return productRepository.findByProductName(productName, pageable);
         } else {
-            return productRepository.findAll();
+            return productRepository.findAll(pageable);
         }
     }
 
-    public ResponseEntity<Product> createNewProduct(Product product, HttpServletResponse response) {
+    public Product createNewProduct(Product product, HttpServletResponse response) {
 
+        product.setProductEntryDate(LocalDate.now());
         Product savedProduct = productRepository.save(product);
         publisher.publishEvent(new ResourceCreatedEvent(this, response, product.getId()));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+        return savedProduct;
     }
 
-    public ResponseEntity<Product> findById(String id) {
+    public Product findById(String id) {
 
-        Product product = productRepository.findById(id)
+        return productRepository.findById(id)
                 .orElseThrow(() -> new EmptyResultDataAccessException(1));
-
-        return ResponseEntity.ok(product);
     }
 
     public void deleteProduct(String id) {

@@ -4,6 +4,8 @@ import com.leivas.productservice.model.Product;
 import com.leivas.productservice.service.ProdutoService;
 import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -23,22 +28,26 @@ public class ProductResource {
     private ProdutoService produtoService;
 
     @GetMapping
-    public List<Product> findAllOrSearch(@RequestParam("productName") @Nullable String productName) {
+    public Page<Product> findAllOrSearch(@RequestParam("productName") @Nullable String productName, Pageable pageable) {
 
-        return produtoService.findAllProductsOrSearchService(productName);
+        return produtoService.findAllProductsOrSearchService(productName, pageable);
     }
     
     @PostMapping(value = "/create")
     public ResponseEntity<Product> createNewProduct(@RequestBody @Valid Product product,
                                                     HttpServletResponse response) {
 
-        return produtoService.createNewProduct(product, response);
+        Product newProduct = produtoService.createNewProduct(product, response);
+
+        return ResponseEntity.status(CREATED).body(newProduct);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<Product> findProductById(@PathVariable String id) {
 
-        return produtoService.findById(id);
+        Product productFound = produtoService.findById(id);
+
+        return ResponseEntity.status(OK).body(productFound);
     }
 
     @DeleteMapping("/{id}")
